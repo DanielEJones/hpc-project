@@ -51,6 +51,8 @@ int main(int argc, char **argv) {
   }
 
   printf("Building Tables.\n");
+  double build_tables_starts = omp_get_wtime();
+
 #pragma omp parallel
   {
     unsigned char local_buffer[MAX_FILE_SIZE];
@@ -70,7 +72,9 @@ int main(int argc, char **argv) {
       omp_unset_lock(&locks[partition]);
     }
   }
-  printf("Table construction complete.\n");
+  double build_tables_ends = omp_get_wtime();
+  printf("Table construction complete. (%lf seconds)\n",
+         build_tables_ends - build_tables_starts);
 
   omp_lock_t result_lock;
   omp_init_lock(&result_lock);
@@ -79,6 +83,7 @@ int main(int argc, char **argv) {
   uint64_t nonce_one, nonce_two, hash_result;
 
   printf("Searching for a match.\n");
+  double search_starts = omp_get_wtime();
 #pragma omp parallel
   {
     unsigned char local_buffer[MAX_FILE_SIZE];
@@ -108,16 +113,19 @@ int main(int argc, char **argv) {
     }
   }
 
+  double search_ends = omp_get_wtime();
+  printf("Seach ended. (%lf seconds)\n", search_ends - search_starts);
+
   if (found) {
     char nonce_buffer[16];
 
     nonce_to_ascii(nonce_one, nonce_buffer, 16);
     set_nonce(file_buffer_one, nonce_buffer);
-    write_pdf("a.out.pdf", file_buffer_one, file_size_one);
+    write_pdf("/group/cits/cits053/a.out.pdf", file_buffer_one, file_size_one);
 
     nonce_to_ascii(nonce_two, nonce_buffer, 16);
     set_nonce(file_buffer_two, nonce_buffer);
-    write_pdf("b.out.pdf", file_buffer_two, file_size_two);
+    write_pdf("/group/cits/cits053/b.out.pdf", file_buffer_two, file_size_two);
 
     printf("Match found:\n"
            "  nonce one: %zu\n"
@@ -127,6 +135,9 @@ int main(int argc, char **argv) {
   } else {
     printf("Failed to match.\n");
   }
+
+  fflush(stdout);
+  fflush(stderr);
 
   omp_destroy_lock(&result_lock);
 
