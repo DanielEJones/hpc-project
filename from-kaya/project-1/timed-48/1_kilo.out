@@ -1,0 +1,9 @@
+cc -fopenmp -Wall -Werror src/*.c -o main
+Building Tables.
+Table construction complete. (33.900984 seconds)
+Searching for a match.
+Seach ended. (1.509991 seconds)
+Match found:
+  nonce one: 19390573
+  nonce two: 3669233
+  hash:      171018805028543

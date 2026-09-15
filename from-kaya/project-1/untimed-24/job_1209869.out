@@ -1,0 +1,5 @@
+cc -fopenmp -Wall -Werror src/*.c -o main
+Building Tables.
+Table construction complete.
+Searching for a match.
+Failed to match.
